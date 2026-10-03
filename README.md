@@ -1,148 +1,197 @@
-# SpeakFill – Voice-to-Form Assistant
+<div align="center">
 
-To rename the app: edit the `<h1>` and `<title>` in `web/index.html` (and `title=` in `app/main.py`).
+# 🎙️ SpeakFill
 
-Speak your details in Urdu / Roman Urdu / English → AI fills the form → you review → PDF.
-Built with **Python (FastAPI)** + a plain HTML/JS frontend (no Node, no build step).
+### Speak once. We fill the form.
 
-**A complete form costs 1–2 LLM calls** (not 50+). See "How we stay inside free API limits" below.
+**Voice-to-form assistant for Urdu, Roman Urdu and English.**
+Speak your details, review the AI-filled form, and download a print-ready PDF.
 
----------------------------------------------------------------------------
+### 🔴 [**Live Demo → https://YOUR-APP-NAME.onrender.com**](https://YOUR-APP-NAME.onrender.com)
 
-## 1. Run it on your laptop (5 minutes)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-LLM-4285F4?logo=google&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-Whisper%20%2B%20Llama-F55036)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+[Live Demo](https://YOUR-APP-NAME.onrender.com) · [Demo Video](https://YOUR-VIDEO-LINK) · [PRD](docs/SpeakFill_PRD.docx)
+
+</div>
+
+---
+
+## 📌 The Problem
+
+Forms for banks, universities and employers are long, written in English, and strict about formats (CNIC, phone, dates). Many people can't read them confidently or can't type quickly in English, so they pay middlemen and hand over private data to strangers.
+
+## 💡 The Solution
+
+SpeakFill lets you **talk instead of type**. Speak in Urdu, Roman Urdu or English. The app transcribes your speech, extracts every field, validates Pakistani formats, asks only for what's missing, and generates a clean **bilingual PDF with correct Urdu text**.
+
+> A complete form costs only **1 to 2 AI calls**, not one per field.
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🗣️ **Multilingual voice input** | Urdu script, Roman Urdu, English (Punjabi, Pashto, Sindhi via Whisper, best effort) |
+| ⚡ **Say everything at once** | One 45-second recording fills the whole form |
+| 🧭 **Guided mode** | One question at a time, with zero AI calls |
+| 🎨 **Colour-coded review** | Green = OK, yellow = check, red = missing |
+| ❓ **Smart follow-ups** | Asks only for missing fields, all together (max 2 rounds) |
+| 🎤 **Mic on every field** | Fix any value by voice or keyboard |
+| ✅ **Local validation** | CNIC, phone, email, dates checked without an LLM |
+| 📄 **Urdu-ready PDF** | Proper right-to-left shaping with bilingual labels |
+| 🛡️ **Never crashes** | Gemini → Groq → rules-only fallback chain |
+| 📴 **Offline demo** | Works with every API down |
+
+## 🧠 How It Stays Fast and Cheap
+
+```
+Voice → Speech-to-text → Rules (regex) → Cache → ONE LLM call → Local validation → Review → PDF
+```
+
+- **Rules first:** CNIC, phone, email and dates are found by regex and never sent to the LLM.
+- **One batched call** for the whole form, using a compact schema and JSON-only output.
+- **Cache:** the same input costs nothing the second time.
+- **Local follow-up questions:** no AI needed.
+- **Rate limiter + per-session budget** so free-tier quotas are never exceeded.
+- A live counter in the header shows AI / voice / cached calls.
+
+## 🏗️ Tech Stack
+
+- **Backend:** Python, FastAPI, Pydantic
+- **AI:** Google Gemini (primary), Groq Llama 3.3 (fallback), Groq Whisper (speech)
+- **Frontend:** HTML, CSS, JavaScript (no build step), Web Speech API
+- **PDF:** ReportLab, arabic-reshaper, python-bidi, Noto Naskh Arabic
+- **Deploy:** Render / Hugging Face Spaces / Railway, Docker supported
+
+## 🚀 Run Locally
 
 ```bash
-# 1. Python 3.10+ required
+# 1. Clone
+git clone https://github.com/YOUR-USERNAME/speakfill.git
+cd speakfill
+
+# 2. Create environment (Python 3.10+)
 python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+.venv\Scripts\activate            # Mac/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 
-# 2. Urdu font for the PDF (one time)
+# 3. Urdu font for the PDF (one time)
 python download_fonts.py
-#    If it fails: download "Noto Naskh Arabic" from fonts.google.com
-#    and copy the .ttf file into app/fonts/
 
-# 3. Add your API keys
-cp .env.example .env               # Windows: copy .env.example .env
-#    open .env and paste your keys (see section 2)
+# 4. Add your API keys
+copy .env.example .env            # Mac/Linux: cp .env.example .env
+# open .env and paste GEMINI_API_KEY and GROQ_API_KEY
 
-# 4. Start
+# 5. Start
 uvicorn app.main:app --reload
 ```
-Open **http://localhost:8000** in **Chrome**.
 
-Check http://localhost:8000/api/health – it tells you which providers are active and whether the Urdu font was found.
-Run tests: `python -m pytest -q`
+Open **http://localhost:8000** in **Chrome**. Check `http://localhost:8000/api/health` to confirm your providers and font are active.
 
-> **No keys yet?** Press **Offline demo** on the first screen. It uses a pre-recorded transcript and a cached
-> model answer, so the whole flow (including the PDF) works with zero API calls and no internet.
+**Free API keys:** [Google AI Studio](https://aistudio.google.com/apikey) · [Groq Console](https://console.groq.com/keys)
 
-## 2. Get the API keys (both are free)
+> No keys yet? Click **▶ Offline demo** on the first screen. The whole flow works without internet.
 
-| Provider | Used for | Where |
-|---|---|---|
-| Google Gemini | Main LLM (extraction) | https://aistudio.google.com/apikey |
-| Groq | LLM fallback + Whisper speech-to-text fallback | https://console.groq.com/keys |
+## 🧪 Tests
 
-Put them in `.env` as `GEMINI_API_KEY=` and `GROQ_API_KEY=`. Only one is required to work; both give you the fallback chain.
-Free-tier limits change often. Open each dashboard's rate-limit page before the event and set
-`GEMINI_RPM`, `GROQ_RPM` in `.env` slightly **below** what you see. Model names also change: if a call fails with 404,
-update `GEMINI_MODEL` / `GROQ_LLM_MODEL` in `.env`.
+```bash
+python -m pytest -q
+```
 
-Never put keys in the frontend or in git. `.env` is already in `.gitignore`.
-
-## Voice not detected? (read this)
-- The page has a **Voice engine** menu. **Auto** uses Whisper when `GROQ_API_KEY` is set (most reliable for Urdu), otherwise Chrome voice.
-- While recording you will see **live level bars**. If they don't move, the browser is not hearing your microphone: check the lock icon in the address bar, the Windows/Android mic permission, and the selected input device.
-- If nothing was heard, the app tells you and does NOT waste an API call.
-- Chrome voice now restarts itself after silence and rebuilds text without duplicates. It still needs internet and HTTPS (or localhost).
-
-## New in v2.0
-- A **microphone on every field**: review screen, follow-up questions and guided mode. Tap, speak, the value fills in.
-- If you do not see the new look, hard-refresh the browser (Ctrl+Shift+R). The footer must say **SpeakFill v2.0**.
-
-## 3. How we stay inside free API limits
-
-| Technique | Where in code | Effect |
-|---|---|---|
-| **One call for the whole form**, not one per field | `pipeline.extract` | 25-field form = 1 call |
-| **Rules first**: CNIC, phone, email, dates found by regex, never sent to the LLM; if rules fill everything, 0 calls | `services/rules.py` | fewer calls and tokens |
-| **Compact schema** (id, type, short label only), JSON-only output, `temperature 0`, Gemini thinking off | `compact_schema`, `llm_router._gemini` | small prompts, small answers |
-| **Follow-up questions are local templates** (no LLM) | `pipeline.build_questions` | 0 calls |
-| **Follow-up answers**: typed per-field answers use rules only; a spoken blob = 1 batched call with only the unresolved fields | `/api/clarify` | 0–1 call |
-| **Max 2 clarification rounds**, then "Please fill manually" | `config.MAX_CLARIFY_ROUNDS` | no endless loops |
-| **Cache** by hash(form, schema, transcript): rehearsals cost nothing | `services/cache.py` | repeat = 0 calls |
-| **Browser speech-to-text first** (free); Whisper only as a fallback | `web/app.js` Recorder | 0 STT calls usually |
-| **Guided mode**: field-by-field with zero AI calls (local validation) | `/api/validate` | 0 calls |
-| **Edits are local**; Confirm only runs local validation | `web/app.js` | 0 calls |
-| **Provider chain** Gemini → Groq → rules-only; one retry with backoff on 429/5xx | `services/llm_router.py` | no crash on limits |
-| **Server-side rate limiter** (sliding window per provider) | `RateLimiter` | we never trigger a 429 ourselves |
-| **Per-session budget guard** (`MAX_LLM_CALLS_PER_SESSION`) | `llm_router.call_json` | one user can't drain the quota |
-| **One request in flight** (client lock + server session lock) | `app.js api()`, `session_lock` | double-clicks can't double-spend |
-| **Offline demo mode** | `/api/demo` | demo never depends on the network |
-| Live counter "AI / voice / cached" in the page header | `services/usage.py` | proof for the judges |
-
-Rotating many free accounts to dodge a quota can violate provider terms, so this project doesn't do that.
-If you really need more quota, enable billing on one key (the cost for this app is tiny) or use a second provider.
-
-## 4. Deploy
-
-The app is one Python web service that also serves the frontend, so deploy it as a single service.
-
-### Option A: Render (recommended, free tier)
-1. Push this folder to a GitHub repo (check `.env` is NOT committed).
-2. render.com → **New → Blueprint** (it reads `render.yaml`) or **New → Web Service**:
-   - Build: `pip install -r requirements.txt && python download_fonts.py`
-   - Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-3. In **Environment**, add `GEMINI_API_KEY` and `GROQ_API_KEY`.
-4. Open the URL. The free tier sleeps after inactivity: open the site a few minutes before your demo.
-
-### Option B: Hugging Face Spaces (Docker)
-1. New Space → SDK **Docker** → upload the files (the `Dockerfile` is included, port 7860).
-2. Settings → **Secrets** → add the two keys.
-
-### Option C: Railway
-New project → Deploy from GitHub → add the two variables. Start command as in Render.
-
-> Vercel is a poor fit for this backend (serverless time limits, no persistent font/cache files). Use Render or Spaces.
-> Microphone access needs **HTTPS** (or localhost). All three options give you HTTPS automatically.
-
-## 5. Project layout
+## 📁 Project Structure
 
 ```
-app/main.py              FastAPI routes
-app/services/pipeline.py rules -> cache -> 1 LLM call -> validate -> questions
-app/services/llm_router.py  Gemini -> Groq -> rules-only, rate limiter, retries
-app/services/rules.py    regex extraction (CNIC, phone, email, date, names)
-app/services/validators.py  local validation + normalisation
-app/services/pdf_builder.py ReportLab + arabic-reshaper + bidi (Urdu)
-app/schemas/*.json       4 built-in forms (edit/add your own: same JSON shape)
-app/demo/demo.json       offline demo data
-web/                     index.html, style.css, app.js
-tests/                   unit tests
+app/
+├── main.py                 FastAPI routes
+├── config.py               Settings from environment variables
+├── services/
+│   ├── pipeline.py         rules → cache → 1 LLM call → validate → questions
+│   ├── llm_router.py       Gemini → Groq → rules-only, rate limiter, retries
+│   ├── rules.py            regex extraction (CNIC, phone, email, date)
+│   ├── validators.py       local validation and normalisation
+│   ├── stt.py              Whisper speech-to-text fallback
+│   ├── pdf_builder.py      Urdu-capable PDF generation
+│   ├── cache.py            result cache
+│   └── usage.py            AI / voice / cached counters
+├── schemas/                built-in forms (JSON)
+└── demo/demo.json          offline demo data
+web/                        index.html, style.css, app.js
+tests/                      unit tests
+docs/                       PRD and screenshots
 ```
-**Add a new form:** copy any file in `app/schemas/`, change `id`, `title_*` and `fields`. Restart. Done.
-Field types: `text, cnic, phone, date, email, select, number, address, textarea`.
 
-## 6. Demo script (3 minutes)
-1. Pitch: long forms + language barrier (20 s).
-2. Pick **Job Application**, tap the mic, speak ~45 s in Urdu/Roman Urdu.
-3. Show the transcript and the colour-coded form.
-4. App asks the missing fields together; answer by voice.
-5. Edit one field, press **Confirm and make PDF**.
-6. Show the Urdu PDF and the header counter ("1 AI · 0 voice").
-**Backup:** press **Offline demo** if the Wi-Fi or an API fails. Rehearse the real flow twice first, because the cache then makes repeat runs free.
+## ➕ Add Your Own Form
 
-## 7. Troubleshooting
-| Problem | Fix |
-|---|---|
-| Mic does nothing | Use Chrome, allow the microphone, use `localhost` or HTTPS |
-| "Browser voice failed" | Tick **High-accuracy voice** (needs `GROQ_API_KEY`) or type |
-| AI says "busy" / filled very little | Quota or key problem: check `/api/health`; rules-only mode still filled what it could |
-| Urdu in PDF shows boxes | Run `python download_fonts.py` or put a Naskh `.ttf` in `app/fonts/` |
-| 404 from Gemini in logs | Model name changed: update `GEMINI_MODEL` |
+Copy any file in `app/schemas/`, change `id`, `title_en`, `title_ur` and `fields`, then restart. No code changes needed.
 
-## 8. Known limits (honest list)
-Upload of arbitrary PDFs / OCR (PRD F3, F4, F25) is **not** included; templates only (P2 in the PRD).
-Punjabi / Pashto / Sindhi work through Whisper (best effort), not the browser.
-Roman Urdu *speech* is recognised as Urdu script by the speech engines; the LLM handles both scripts.
+Field types: `text`, `cnic`, `phone`, `date`, `email`, `select`, `number`, `address`, `textarea`.
+
+**Built-in forms:** Job Application · Bank Account Opening · University Admission · Complaint Letter
+
+## 🔌 API
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/health` | Active providers, font status |
+| GET | `/api/forms` | List forms |
+| POST | `/api/transcribe` | Audio → text |
+| POST | `/api/extract` | Transcript → filled fields |
+| POST | `/api/clarify` | Resolve missing fields |
+| POST | `/api/validate` | Local validation only |
+| POST | `/api/pdf` | Values → PDF |
+
+Interactive docs are available at `/docs` when the server is running.
+
+## ☁️ Deploy
+
+1. Push this repo to GitHub (make sure `.env` is **not** committed).
+2. On [Render](https://render.com): **New → Blueprint** → select the repo (reads `render.yaml`).
+3. Add `GEMINI_API_KEY` and `GROQ_API_KEY` in the environment settings.
+4. Deploy. HTTPS is automatic, which the microphone requires.
+
+Also supports Hugging Face Spaces (Docker) and Railway. The free tier sleeps when idle, so open the site a few minutes before a demo.
+
+## 🗺️ Roadmap
+
+- [x] Voice dictation and guided mode
+- [x] 4 built-in forms, Urdu PDF, offline demo
+- [ ] Upload any PDF or image and auto-detect fields (OCR)
+- [ ] Opt-in saved profile for repeat forms
+- [ ] Form builder for organisations
+- [ ] WhatsApp bot and embeddable widget
+- [ ] Direct integrations with institutions
+
+## 🔒 Privacy
+
+No accounts and no database of personal data. API keys stay on the server and are never exposed to the browser. Audio and text are sent only to the configured speech and LLM providers. Users always review and confirm before a PDF is created.
+
+## ⚠️ Known Limits
+
+- Arbitrary PDF upload / OCR is not included yet (see Roadmap).
+- Punjabi, Pashto and Sindhi work through Whisper on a best-effort basis.
+- Free-tier API limits and model names change; update `.env` if a call returns 404.
+
+## 📸 Screenshots
+
+<!-- Add your images to docs/ and uncomment -->
+<!-- ![Home](docs/home.png) -->
+<!-- ![Review](docs/review.png) -->
+<!-- ![PDF](docs/pdf.png) -->
+
+## 👥 Team
+
+Built for **[Hackathon Name]** by **[Your Name / Team Name]**.
+
+## 📄 License
+
+MIT License. See [LICENSE](LICENSE) if you add one.
+
+---
+
+<div align="center">
+<b>SpeakFill</b>: because everyone deserves to fill a form in their own language. 🇵🇰
+</div>
