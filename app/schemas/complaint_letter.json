@@ -1,0 +1,78 @@
+{
+ "id": "complaint_letter",
+ "title_en": "Complaint / Application Letter",
+ "title_ur": "شکایت / درخواست",
+ "fields": [
+  {
+   "id": "full_name",
+   "label_en": "Full Name",
+   "label_ur": "پورا نام",
+   "type": "text",
+   "required": true,
+   "example": "Ali Raza",
+   "validation": {
+    "min_length": 3
+   }
+  },
+  {
+   "id": "cnic",
+   "label_en": "CNIC Number",
+   "label_ur": "شناختی کارڈ نمبر",
+   "type": "cnic",
+   "required": true,
+   "example": "35202-1234567-1"
+  },
+  {
+   "id": "phone",
+   "label_en": "Mobile Number",
+   "label_ur": "موبائل نمبر",
+   "type": "phone",
+   "required": true,
+   "example": "0300-1234567"
+  },
+  {
+   "id": "address",
+   "label_en": "Postal Address",
+   "label_ur": "مکمل پتہ",
+   "type": "address",
+   "required": true,
+   "example": "House 12, Street 4, Model Town"
+  },
+  {
+   "id": "authority",
+   "label_en": "Addressed To (Office / Authority)",
+   "label_ur": "متعلقہ ادارہ / افسر",
+   "type": "text",
+   "required": true,
+   "example": "Deputy Commissioner Lahore"
+  },
+  {
+   "id": "subject",
+   "label_en": "Subject",
+   "label_ur": "موضوع",
+   "type": "text",
+   "required": true,
+   "example": "Complaint about water supply",
+   "validation": {
+    "min_length": 5
+   }
+  },
+  {
+   "id": "details",
+   "label_en": "Details",
+   "label_ur": "تفصیل",
+   "type": "textarea",
+   "required": true,
+   "validation": {
+    "min_length": 15
+   }
+  },
+  {
+   "id": "request",
+   "label_en": "Action Requested",
+   "label_ur": "مطلوبہ کارروائی",
+   "type": "textarea",
+   "required": false
+  }
+ ]
+}

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpeakFill – Speak, we fill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<header class="hero">
+  <div class="hero-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">🎙️</div>
+      <h1><span class="en">Speak<em>Fill</em></span></h1>
+      <div class="usage" title="API calls used in this session"><b id="u-llm">0</b> AI <b id="u-stt">0</b> voice <b id="u-cache">0</b> cached</div>
+    </div>
+    <h2 class="big">Speak once.<br><span>We fill the form.</span></h2>
+    <p class="tag">Urdu, Roman Urdu or English. Review it, then download your PDF.</p>
+    <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <ol class="steps" id="steps"><li class="on">Choose</li><li>Speak</li><li>Check</li><li>PDF</li></ol>
+  </div>
+</header>
+
+<main>
+  <section id="s-setup" class="panel">
+    <h2>Choose a form</h2>
+    <div id="form-list" class="choices" role="radiogroup" aria-label="Form type"></div>
+    <div class="grid2">
+      <label>Language you will speak
+        <select id="lang">
+          <option value="ur-PK|ur|0">اردو / Roman Urdu</option>
+          <option value="en-PK|en|0">English</option>
+          <option value="pa-PK|pa|1">Punjabi (Whisper)</option>
+          <option value="ps-PK|ps|1">Pashto (Whisper)</option>
+          <option value="sd-PK|sd|1">Sindhi (Whisper)</option>
+        </select>
+      </label>
+      <label>How do you want to fill?
+        <select id="mode">
+          <option value="dictation">Say everything at once (fastest)</option>
+          <option value="guided">One question at a time</option>
+        </select>
+      </label>
+      <label>Voice engine
+        <select id="engine">
+          <option value="auto">Auto (recommended)</option>
+          <option value="whisper">Whisper (most accurate)</option>
+          <option value="browser">Browser voice (Chrome)</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btn-start">Start →</button>
+      <button class="ghost" id="btn-demo" title="Works even when every API is down">▶ Offline demo</button>
+    </div>
+  </section>
+
+  <section id="s-speak" class="panel hidden">
+    <h2>Speak, then check the text</h2>
+    <p class="hint">Say everything in one go: name, father's name, CNIC, date of birth, phone, city… Tap the mic to start and tap again to stop.</p>
+    <div class="mic-row">
+      <button class="mic" id="mic-main" aria-label="Start or stop recording">🎤</button>
+      <div class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div><div class="timer" id="timer">0:00</div><div class="state" id="rec-state">Tap the microphone and speak</div></div>
+    </div>
+    <textarea id="transcript" rows="6" dir="auto" placeholder="Your words appear here. You can edit or simply type."></textarea>
+    <div class="actions">
+      <button class="primary" id="btn-extract">✨ Fill the form</button>
+      <button class="ghost" id="btn-back1">Back</button>
+    </div>
+  </section>
+
+  <section id="s-guided" class="panel hidden">
+    <h2 id="g-title">Question</h2>
+    <p class="q-ur" dir="rtl" lang="ur" id="g-ur"></p>
+    <p id="g-en" class="q-en"></p>
+    <div id="g-input-wrap"></div>
+    <div class="mic-row">
+      <button class="mic small" id="mic-guided" aria-label="Speak your answer">🎤</button>
+      <div class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <span class="timer" id="timer-g">0:00</span>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="g-prev">Previous</button>
+      <button class="primary" id="g-next">Next</button>
+      <button class="ghost" id="g-skip">Skip</button>
+    </div>
+    <progress id="g-progress" value="0" max="1"></progress>
+  </section>
+
+  <section id="s-review" class="panel hidden">
+    <h2>Check and confirm</h2>
+    <div class="legend"><i class="dot ok"></i>Sure <i class="dot check"></i>Please check <i class="dot bad"></i>Missing or wrong</div>
+    <div id="clarify" class="clarify hidden">
+      <h3>A few details are missing</h3>
+      <p class="hint">Answer below, or say all answers together with the microphone.</p>
+      <div id="clarify-list"></div>
+      <div class="mic-row">
+        <button class="mic small" id="mic-clarify" aria-label="Speak all answers">🎤</button>
+        <div class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <span class="timer" id="timer-c">0:00</span>
+      </div>
+      <textarea id="clarify-text" rows="2" dir="auto" placeholder="Or type all answers here, e.g. CNIC 35202 1234567 1"></textarea>
+      <div class="actions">
+        <button class="primary" id="btn-clarify">Submit answers</button>
+        <button class="ghost" id="btn-skip-clarify">I will fill these myself</button>
+      </div>
+    </div>
+    <div id="rows"></div>
+    <div class="actions">
+      <button class="primary big" id="btn-confirm">Confirm and make PDF</button>
+      <button class="ghost" id="btn-restart">Start over</button>
+    </div>
+  </section>
+
+  <section id="s-pdf" class="panel hidden">
+    <h2>🎉 Your PDF is ready</h2>
+    <div class="actions">
+      <a class="primary linkbtn" id="pdf-download" download="form.pdf">⬇ Download PDF</a>
+      <button class="ghost" id="btn-back-review">Back to edit</button>
+    </div>
+    <iframe id="pdf-frame" title="PDF preview"></iframe>
+  </section>
+</main>
+
+<footer>
+  <p><b>SpeakFill v2.0</b></p>
+  <p>Privacy: your text is sent to our AI providers (Google Gemini / Groq) only to fill this form, and voice may be processed by Groq Whisper or your browser's speech service. Nothing is stored in a database.</p>
+</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js?v=2"></script>
+</body>
+</html>

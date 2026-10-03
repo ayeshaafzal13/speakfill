@@ -1,0 +1,130 @@
+{
+ "id": "university_admission",
+ "title_en": "University Admission Form",
+ "title_ur": "یونیورسٹی داخلہ فارم",
+ "fields": [
+  {
+   "id": "full_name",
+   "label_en": "Full Name",
+   "label_ur": "پورا نام",
+   "type": "text",
+   "required": true,
+   "example": "Ali Raza",
+   "validation": {
+    "min_length": 3
+   }
+  },
+  {
+   "id": "father_name",
+   "label_en": "Father's Name",
+   "label_ur": "والد کا نام",
+   "type": "text",
+   "required": true,
+   "example": "Muhammad Aslam"
+  },
+  {
+   "id": "cnic",
+   "label_en": "CNIC Number",
+   "label_ur": "شناختی کارڈ نمبر",
+   "type": "cnic",
+   "required": true,
+   "example": "35202-1234567-1"
+  },
+  {
+   "id": "dob",
+   "label_en": "Date of Birth",
+   "label_ur": "تاریخ پیدائش",
+   "type": "date",
+   "required": true,
+   "example": "15-03-2001",
+   "validation": {
+    "past": true
+   }
+  },
+  {
+   "id": "gender",
+   "label_en": "Gender",
+   "label_ur": "جنس",
+   "type": "select",
+   "required": true,
+   "options": [
+    "Male",
+    "Female",
+    "Other"
+   ]
+  },
+  {
+   "id": "phone",
+   "label_en": "Mobile Number",
+   "label_ur": "موبائل نمبر",
+   "type": "phone",
+   "required": true,
+   "example": "0300-1234567"
+  },
+  {
+   "id": "email",
+   "label_en": "Email",
+   "label_ur": "ای میل",
+   "type": "email",
+   "required": false,
+   "example": "ali@example.com"
+  },
+  {
+   "id": "city",
+   "label_en": "City",
+   "label_ur": "شہر",
+   "type": "text",
+   "required": true,
+   "example": "Lahore"
+  },
+  {
+   "id": "address",
+   "label_en": "Postal Address",
+   "label_ur": "مکمل پتہ",
+   "type": "address",
+   "required": true,
+   "example": "House 12, Street 4, Model Town"
+  },
+  {
+   "id": "last_degree",
+   "label_en": "Last Degree Completed",
+   "label_ur": "آخری سند",
+   "type": "select",
+   "required": true,
+   "options": [
+    "Matric",
+    "Intermediate",
+    "A-Levels",
+    "Bachelor's"
+   ]
+  },
+  {
+   "id": "marks_percentage",
+   "label_en": "Marks (%)",
+   "label_ur": "حاصل کردہ نمبر (فیصد)",
+   "type": "number",
+   "required": true,
+   "example": "78",
+   "validation": {
+    "min": 0,
+    "max": 100
+   }
+  },
+  {
+   "id": "program",
+   "label_en": "Program Applied For",
+   "label_ur": "درخواست کردہ پروگرام",
+   "type": "text",
+   "required": true,
+   "example": "BS Computer Science"
+  },
+  {
+   "id": "last_institution",
+   "label_en": "Last Institution",
+   "label_ur": "آخری ادارہ",
+   "type": "text",
+   "required": false,
+   "example": "Government College"
+  }
+ ]
+}

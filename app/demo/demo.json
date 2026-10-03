@@ -1,0 +1,17 @@
+{
+  "form_id": "job_application",
+  "transcript": "mera naam Ali Raza hai, walid ka naam Muhammad Aslam hai. Meri date of birth 15 March 2001 hai. Mera mobile number 0300 1234567 hai aur email ali.raza at gmail dot com. Main Lahore mein rehta hoon, Model Town, house number 12. Main Data Entry Operator ki job ke liye apply kar raha hoon, meri taleem Bachelor's hai aur 2 saal ka tajurba hai.",
+  "llm_response": {
+    "full_name": {"value": "Ali Raza", "confidence": 0.97},
+    "father_name": {"value": "Muhammad Aslam", "confidence": 0.95},
+    "city": {"value": "Lahore", "confidence": 0.96},
+    "address": {"value": "House 12, Model Town, Lahore", "confidence": 0.85},
+    "position": {"value": "Data Entry Operator", "confidence": 0.93},
+    "qualification": {"value": "Bachelor's", "confidence": 0.9},
+    "institution": {"value": null, "confidence": 0},
+    "experience_years": {"value": "2", "confidence": 0.9},
+    "skills": {"value": null, "confidence": 0},
+    "cnic": {"value": null, "confidence": 0}
+  },
+  "followup_answers": {"cnic": "35202 1234567 1"}
+}

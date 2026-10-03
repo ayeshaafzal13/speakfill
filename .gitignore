@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+app/cache.json
+app/fonts/*.ttf

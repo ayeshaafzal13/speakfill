@@ -1,0 +1,245 @@
+PRODUCT REQUIREMENTS DOCUMENT
+SpeakFill
+Voice-to-Form Assistant for Urdu, Roman Urdu and English
+Field	Detail
+Document version	1.0 (Hackathon Release / MVP v2.0)
+Status	Approved for build and demo
+Date	03 October 2026
+Product owner	SpeakFill Team  [replace with your name]
+Platform	Responsive web app (Chrome recommended); FastAPI backend
+Primary market	Pakistan (initial); South Asia (expansion)
+
+ Contents
+1. Executive Summary	1
+Key differentiators	1
+2. Problem Statement	1
+3. Vision, Goals and Non-Goals	1
+Product goals	1
+Non-goals (this release)	1
+4. Target Users and Personas	1
+5. User Stories	1
+6. Scope and Release Plan	1
+7. Functional Requirements	1
+8. User Flow	1
+9. Non-Functional Requirements	1
+10. System Architecture	1
+Data flow	1
+11. AI Design, Cost Control and Safety	1
+Cost-control techniques	1
+Safety and quality	1
+Privacy and data handling	1
+12. Success Metrics	1
+13. Competitive Landscape	1
+14. Business Model and Go-to-Market	1
+Monetisation options	1
+Go-to-market	1
+15. Risks and Mitigations	1
+16. Hackathon Alignment	1
+3-minute demo script	1
+17. Open Questions	1
+Appendix A. API Endpoints	1
+Appendix B. Built-in Forms and Field Types	1
+
+
+ 1. Executive Summary
+SpeakFill lets a person fill a long, formal form by simply talking. The user speaks once, in Urdu, Roman Urdu or English. The system transcribes the speech, extracts structured values with a single AI call, validates them locally (CNIC, phone, email, dates), asks only for what is missing, and produces a clean, print-ready PDF that supports Urdu script.
+In Pakistan, forms for banks, universities, employers and public offices are mostly in English, long, and unforgiving about formatting. Millions of people either cannot read them confidently or cannot type quickly in English. SpeakFill removes both barriers while keeping the user in control through a mandatory review step.
+Key differentiators
+•	Local-first language support: Urdu script, Roman Urdu and code-mixed speech; Pakistani formats (CNIC 13 digits, 03xx phone, day-first dates) are native.
+•	Cost-efficient AI: A full form costs 1 to 2 LLM calls, not one per field. Deterministic rules run before the model, and repeat inputs are served from cache.
+•	Trust by design: Every value is colour-coded by confidence, nothing is invented, and the user confirms before a PDF is created.
+•	Resilient: Provider chain (Gemini, then Groq, then rules-only) plus an offline demo mode, so the product never hard-fails.
+2. Problem Statement
+Form-filling is a high-friction, high-stakes task. A single mistake (a wrong CNIC digit or date format) can cause rejection, repeat visits, or paying a middleman.
+Pain point	Impact
+Language barrier	Forms are in English; many users think and speak in Urdu or a regional language.
+Typing barrier	Typing Urdu or long English addresses on a phone is slow and error-prone.
+Format strictness	CNIC, phone and date formats are validated manually by staff; errors cause rejection.
+Dependence on middlemen	Users pay typists or cyber cafes and share private data (CNIC, address) with strangers.
+Existing AI tools	General chatbots do not output a validated, formatted form, and are costly or inconsistent for Urdu.
+Note: market sizing figures are intentionally not stated here as facts. Before external distribution, validate them with a source (see Section 17, Open Questions).
+3. Vision, Goals and Non-Goals
+Vision: Every person can complete any official form in their own language, in minutes, without a middleman.
+Product goals
+•	G1. Reduce time to complete a 13-field form from roughly 10 to 15 minutes (manual) to under 3 minutes.
+•	G2. Achieve at least 90% field-level accuracy after review for supported forms (target, to be measured in user testing).
+•	G3. Keep AI cost at or below 2 LLM calls per completed form.
+•	G4. Remain fully usable on free-tier API quotas and degrade gracefully when quotas run out.
+Non-goals (this release)
+•	Uploading arbitrary PDFs or scanned forms and auto-detecting fields (OCR). Planned for Phase 2.
+•	Direct submission to banks, universities or government portals.
+•	User accounts, payments and long-term storage of personal data.
+•	Native mobile apps (responsive web works on mobile browsers).
+4. Target Users and Personas
+Persona	Profile	Needs
+Ayesha, 22 Fresh graduate	Urban, comfortable speaking English/Urdu mix, applying to many jobs and universities.	Speed; repeat forms without retyping; clean PDF.
+Muhammad Aslam, 48 Small shopkeeper	Fluent in Urdu, limited English reading, wants to open a bank account.	Voice only; Urdu labels; confidence he is not making mistakes.
+Rukhsana, 35 First-time applicant	Regional language speaker (Punjabi/Pashto/Sindhi), limited digital literacy.	Guided, one-question-at-a-time mode; very simple screens.
+Cyber cafe / help desk operator	Fills forms for walk-in customers all day.	Throughput; multi-form support; accuracy.
+5. User Stories
+ID	As a ... I want ... so that ...	Priority
+US-1	As an applicant, I want to speak all my details in one go so that I do not have to type.	Must
+US-2	As a user, I want to speak in Urdu, Roman Urdu or English so that I can use my natural language.	Must
+US-3	As a user, I want to see which fields the AI is unsure about so that I can fix them quickly.	Must
+US-4	As a user, I want the app to ask only for missing fields so that I do not repeat myself.	Must
+US-5	As a user, I want to download a clean PDF (with Urdu text rendered correctly) so that I can print or submit it.	Must
+US-6	As a low-literacy user, I want a guided mode with one question at a time so that I am not overwhelmed.	Should
+US-7	As a user, I want to fix any field by voice or keyboard so that I stay in control.	Should
+US-8	As a presenter, I want an offline demo so that the product works without internet.	Should
+6. Scope and Release Plan
+Phase	Scope	Status
+MVP (v2.0)	Voice dictation + guided mode, 4 built-in forms, AI extraction, local validation, clarification loop, Urdu PDF, usage counter, offline demo, cloud deployment	Built; 10 automated tests passing
+Phase 2 (0 to 3 months)	PDF/image upload with OCR and field detection, form builder UI, saved profile (opt-in), more forms (NADRA, passport, utility, scholarship)	Planned
+Phase 3 (3 to 9 months)	Mobile apps, WhatsApp bot, organisation dashboard, REST API and embeddable widget, more languages	Planned
+Phase 4 (9+ months)	Direct integrations with institutions, e-signature, analytics, enterprise SSO	Vision
+7. Functional Requirements
+Priority uses MoSCoW (M = Must, S = Should, C = Could). Status reflects the current codebase.
+ID	Requirement	Pri.	Status	Module
+FR-1	User selects one of the available forms (Job Application, Bank Account, University Admission, Complaint Letter).	M	Done	forms.py
+FR-2	User selects speaking language: Urdu/Roman Urdu, English, Punjabi, Pashto, Sindhi.	M	Done	app.js
+FR-3	Voice capture with live audio-level feedback; detects no-speech and avoids a wasted API call.	M	Done	app.js
+FR-4	Speech-to-text via browser engine (free) with Whisper (Groq) as high-accuracy fallback.	M	Done	stt.py
+FR-5	Rule-based extraction of CNIC, phone, email, dates and names before any AI call.	M	Done	rules.py
+FR-6	One batched LLM call extracts all remaining fields with a confidence score each; never invents data.	M	Done	pipeline.py
+FR-7	Local validation and normalisation per field type (text, cnic, phone, date, email, select, number, address, textarea).	M	Done	validators.py
+FR-8	Colour-coded review screen: OK, check, missing.	M	Done	app.js
+FR-9	Clarification loop: locally generated questions for unresolved fields; max 2 rounds, then manual entry.	M	Done	pipeline.py
+FR-10	Any field editable by keyboard or by a per-field microphone.	S	Done	app.js
+FR-11	Guided mode: field-by-field with zero AI calls.	S	Done	/api/validate
+FR-12	PDF generation with bilingual labels and correct Urdu shaping (RTL).	M	Done	pdf_builder.py
+FR-13	Result caching by hash of form, schema and transcript.	S	Done	cache.py
+FR-14	Provider fallback chain Gemini, Groq, rules-only with retry and backoff.	M	Done	llm_router.py
+FR-15	Per-session budget guard and server-side sliding-window rate limiter.	M	Done	llm_router.py
+FR-16	Live usage counter (AI, voice, cached calls).	C	Done	usage.py
+FR-17	Offline demo using a recorded transcript and cached model response.	S	Done	/api/demo
+FR-18	Add a new form by dropping a JSON schema file; no code change.	S	Done	schemas/
+FR-19	Health endpoint reporting active providers, font availability and form count.	C	Done	/api/health
+FR-20	Upload an existing PDF/image and auto-detect fields (OCR).	S	Phase 2	-
+FR-21	Opt-in saved profile to pre-fill repeat fields.	C	Phase 2	-
+FR-22	In-app form builder for organisations.	C	Phase 3	-
+8. User Flow
+Step	Screen	What happens
+1	Choose	User picks a form, language, mode (dictation or guided) and voice engine.
+2	Speak	User records for about 45 seconds. Live level bars confirm the mic is working. Transcript can be edited.
+3	Process	Rules extract structured fields. Cache is checked. If needed, one LLM call fills the rest. Everything is validated locally.
+4	Check	Colour-coded form. Missing or low-confidence fields are grouped into short follow-up questions, answered by voice or keyboard (max 2 rounds).
+5	Confirm	User edits any field; local validation runs on Confirm (no AI call).
+6	PDF	Bilingual, print-ready PDF is downloaded.
+9. Non-Functional Requirements
+Category	Requirement	Target
+Performance	Extraction response (rules + 1 LLM call) on a normal connection	p95 under 6 s
+Performance	Cached or rules-only response	under 1 s
+Reliability	Graceful degradation when an AI provider fails or is rate-limited	No unhandled errors; rules-only fallback
+Cost	LLM calls per completed form	at most 2 (average)
+Security	API keys only on server; no keys in frontend or git; friendly errors without stack traces	Required
+Privacy	Personal data minimisation; no accounts; no analytics on field values (see Section 11)	Required
+Accessibility	Large tap targets, voice-first, bilingual labels, keyboard operable	WCAG 2.1 AA (goal)
+Compatibility	Chrome (desktop and Android) primary; HTTPS required for microphone	Required
+Scalability	Stateless API; horizontal scale; swap JSON cache for Redis in production	Phase 2
+Maintainability	Automated tests; forms defined as data	10 tests passing
+10. System Architecture
+SpeakFill is a single deployable service: a FastAPI backend that also serves a no-build HTML/CSS/JS frontend. This keeps deployment simple and demos reliable.
+Layer	Technology and role
+Frontend	Plain HTML, CSS, JavaScript. Web Speech API and MediaRecorder for voice. Poppins and Noto Nastaliq Urdu fonts.
+API	FastAPI with Pydantic validation. Endpoints listed in Appendix A.
+Pipeline	Rules, then cache, then one LLM call, then local validation, then local question builder.
+LLM router	Gemini (primary), Groq Llama (fallback), rules-only (last resort). JSON-only output, temperature 0.
+Speech	Browser STT first (free); Groq Whisper fallback and for regional languages.
+PDF	ReportLab with arabic-reshaper and python-bidi, Noto Naskh Arabic font.
+Hosting	Render (Blueprint), Hugging Face Spaces (Docker) or Railway. HTTPS provided.
+Data flow
+Voice  >  Speech-to-text  >  Transcript  >  Rule extraction  >  Cache lookup  >  (single) LLM call for the remaining fields  >  Local validation and colour status  >  Local follow-up questions  >  User review  >  PDF.
+11. AI Design, Cost Control and Safety
+Cost-control techniques
+Technique	Effect
+One call per form (batched)	25-field form costs 1 call, not 25.
+Rules before AI	Regex fills CNIC, phone, email and dates for free; if all fields are filled, 0 LLM calls.
+Compact schema	Only id, type and short label are sent, reducing tokens.
+Local follow-up questions	Template questions need no AI.
+Cache	Repeated transcripts cost nothing.
+Rate limiter and session budget	Prevents self-inflicted 429 errors and one user draining the quota.
+Single in-flight request	Client and server locks prevent double-spending on double clicks.
+Safety and quality
+•	The prompt forbids inventing data: unclear fields return null with confidence 0.
+•	Spoken numbers are converted to digits; dates are interpreted day-first, as in Pakistani speech.
+•	The user always reviews and confirms before PDF creation (human in the loop).
+•	Speech recognition errors are tolerated: the model fixes obvious ones and lowers confidence so the field turns yellow.
+Privacy and data handling
+Forms contain sensitive identifiers (CNIC, phone, address). Requirements:
+•	No user accounts and no database of personal data in the MVP.
+•	Audio is sent only to the speech provider for transcription; transcripts and values are sent only to the LLM provider chosen by the operator.
+•	Production requirement: the on-disk result cache must not persist personal values. Use in-memory only, or store hashed keys with short TTL, and disclose provider processing in a privacy notice.
+•	Secrets live in environment variables; .env is git-ignored.
+12. Success Metrics
+Metric	Definition	Target
+Time to complete	Start to PDF download, median	under 3 minutes
+Field accuracy	Fields unchanged by the user at Confirm / total fields	at least 90%
+Completion rate	Sessions reaching PDF / sessions started	at least 70%
+AI efficiency	Average LLM calls per completed form	at most 2
+Voice success	Recordings producing usable transcript	at least 90%
+User satisfaction	Post-task rating (1 to 5)	at least 4.2
+Reliability	Requests ending in a handled outcome (no crash)	at least 99%
+13. Competitive Landscape
+Alternative	Strength	Gap SpeakFill fills
+Typing manually or cyber cafe	Familiar	Slow, costs money, shares private data with a third party.
+General chatbots (ChatGPT-style)	Flexible	No form schema, no CNIC/phone validation, no PDF, inconsistent output.
+Phone keyboard voice typing	Free, built in	Dictates text into one field at a time; no understanding of the form.
+Global form-fill and autofill tools	Polished	Text-first, English-centric, no Urdu/Roman Urdu or Pakistani formats.
+14. Business Model and Go-to-Market
+Monetisation options
+•	B2C freemium: Free for a few forms per month; paid for unlimited forms, saved profile and priority processing.
+•	B2B / B2G: Per-seat or per-form pricing for banks, universities, HR agencies and help desks; white-label widget on their sites.
+•	API: Voice-to-structured-data for other builders, billed per call.
+Go-to-market
+•	Pilot with 2 to 3 university admission offices and one bank branch or microfinance partner.
+•	Partner with cyber cafes and digital literacy programmes as distribution channels.
+•	Short Urdu video demos on social media; WhatsApp sharing of the PDF.
+15. Risks and Mitigations
+Risk	Level	Mitigation
+Free-tier quota or model name changes	High	Provider chain, rate limiter, budget guard, rules-only fallback, configurable model names.
+Urdu speech recognition errors	High	Whisper option, editable transcript, confidence colours, review step.
+Privacy of sensitive data	High	No accounts, no persistent PII, privacy notice, in-memory cache in production.
+Wrong data submitted by trusting AI	Med	Never invent data, mandatory confirmation, local validators.
+Free hosting sleeps after inactivity	Med	Warm up before demos; offline demo mode as backup.
+Browser limitations (Web Speech API)	Med	Whisper fallback; typed input always available.
+Institutions reject printed forms	Med	Pilot partners to approve layouts; template customisation in Phase 2.
+16. Hackathon Alignment
+How the project maps to typical judging criteria and what to emphasise in the demo.
+Criterion	Evidence
+Problem and impact	Language and typing barriers in Pakistan; time and money saved; dignity and privacy for first-time applicants.
+Innovation	Urdu/Roman Urdu voice to validated form to Urdu PDF; 1 to 2 AI calls per form.
+Technical depth	Rules-first hybrid pipeline, provider fallback, rate limiting, caching, bidi PDF rendering, tests.
+Usability	Colour-coded review, guided mode, per-field mic, offline demo.
+Feasibility and scalability	Forms as JSON; stateless service; clear roadmap; low cost per form.
+Business viability	B2C, B2B and API models; clear pilot partners.
+3-minute demo script
+•	0:00 Problem: long English forms, language barrier (20 s).
+•	0:20 Choose Job Application, speak about 45 seconds in Urdu/Roman Urdu.
+•	1:10 Show transcript and colour-coded form; point to the header counter (1 AI, 0 voice).
+•	1:50 Answer the grouped follow-up questions by voice; edit one field.
+•	2:30 Confirm and show the Urdu PDF.
+•	2:50 Close with roadmap (OCR upload, partners) and ask. Backup: Offline demo button.
+17. Open Questions
+•	Which institutions will pilot, and can we obtain their official form templates?
+•	Confirm current free-tier limits and model names for Gemini and Groq before launch.
+•	Source and cite market-size data (internet users, banked population, applicants per year) for investor material.
+•	Legal review of data-protection obligations for CNIC and other identifiers.
+Appendix A. API Endpoints
+Method	Path	Purpose
+GET	/api/health	Active providers, STT fallback, Urdu font, form count
+GET	/api/forms	List built-in forms
+GET	/api/forms/{id}	Full schema of one form
+GET	/api/usage	Per-session AI, voice and cached counters
+GET	/api/demo	Offline demo transcript and answers
+POST	/api/transcribe	Audio to text (Whisper fallback)
+POST	/api/extract	Transcript to filled fields with confidence and questions
+POST	/api/clarify	Resolve unresolved fields (0 or 1 LLM call)
+POST	/api/validate	Local validation only (guided mode, Confirm)
+POST	/api/pdf	Validated values to PDF
+Appendix B. Built-in Forms and Field Types
+Form	Fields	Notes
+Job Application	13	Name, father's name, CNIC, DOB, phone, email, city, address, etc.
+Bank Account Opening	13	Identity and contact details with select options
+University Admission	13	Personal and academic details
+Complaint Letter	8	Includes free-text complaint (textarea) kept in speaker's language
+Supported field types: text, cnic, phone, date, email, select, number, address, textarea. Each form is a JSON file with bilingual labels, required flag, example and optional validation rules.
