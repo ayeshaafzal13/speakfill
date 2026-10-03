@@ -175,16 +175,6 @@ No accounts and no database of personal data. API keys stay on the server and ar
 - Punjabi, Pashto and Sindhi work through Whisper on a best-effort basis.
 - Free-tier API limits and model names change; update `.env` if a call returns 404.
 
-## 📸 Screenshots
-
-<!-- Add your images to docs/ and uncomment -->
-<!-- ![Home](docs/home.png) -->
-<!-- ![Review](docs/review.png) -->
-<!-- ![PDF](docs/pdf.png) -->
-
-## 👥 Team
-
-Built for **[Hackathon Name]** by **[Your Name / Team Name]**.
 
 ## 📄 License
 
